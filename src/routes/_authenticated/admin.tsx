@@ -31,6 +31,16 @@ function AdminPage() {
 
   if (loading) return null;
   if (!isAdmin) {
+    const claimAdmin = async () => {
+      const { data, error } = await supabase.rpc("claim_first_admin");
+      if (error) return toast.error(error.message);
+      if (data) {
+        toast.success("Você agora é admin! Recarregando...");
+        setTimeout(() => window.location.reload(), 800);
+      } else {
+        toast.error("Já existe um administrador no sistema.");
+      }
+    };
     return (
       <div className="flex min-h-screen flex-col bg-background">
         <Header />
@@ -42,9 +52,15 @@ function AdminPage() {
               Esta área é exclusiva para administradores. Sua conta ({user?.email}) não tem
               permissão de admin.
             </p>
-            <Button className="mt-4" onClick={() => navigate({ to: "/" })}>
-              Voltar para a loja
-            </Button>
+            <div className="mt-5 flex flex-col gap-2">
+              <Button onClick={claimAdmin} variant="outline">
+                Tornar-me admin (primeira configuração)
+              </Button>
+              <Button onClick={() => navigate({ to: "/" })}>Voltar para a loja</Button>
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              O botão acima só funciona se ainda não houver nenhum admin cadastrado.
+            </p>
           </div>
         </main>
         <Footer />
