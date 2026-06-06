@@ -9,14 +9,20 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Lock } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 
 type Ctx = { open: () => void; close: () => void };
 const LoginGateCtx = createContext<Ctx | null>(null);
 
 export function LoginGateProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
+  const go = (mode: "login" | "signup") => {
+    setIsOpen(false);
+    navigate({ to: "/auth", search: { mode } });
+  };
 
   return (
     <LoginGateCtx.Provider value={{ open, close }}>
@@ -27,24 +33,21 @@ export function LoginGateProvider({ children }: { children: ReactNode }) {
             <div className="mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
               <Lock className="size-6" />
             </div>
-            <DialogTitle className="text-center text-xl">
-              Cadastro necessário
-            </DialogTitle>
+            <DialogTitle className="text-center text-xl">Cadastro necessário</DialogTitle>
             <DialogDescription className="text-center">
-              Para visualizar valores e realizar compras é necessário realizar
-              seu cadastro.
+              Para visualizar valores e realizar compras é necessário realizar seu cadastro.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-center">
-            <Button variant="outline" className="flex-1" onClick={close}>
+            <Button variant="outline" className="flex-1" onClick={() => go("login")}>
               Entrar
             </Button>
-            <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={close}>
+            <Button className="flex-1 bg-primary hover:bg-primary/90" onClick={() => go("signup")}>
               Criar Conta
             </Button>
           </DialogFooter>
           <p className="text-center text-xs text-muted-foreground">
-            Em breve: cadastro PF e PJ, pedidos via WhatsApp e painel do cliente.
+            Cadastro Pessoa Física ou Jurídica · Pedido enviado via WhatsApp
           </p>
         </DialogContent>
       </Dialog>
